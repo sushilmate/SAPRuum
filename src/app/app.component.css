@@ -1,0 +1,81 @@
+/*extra 10 px for bottom buffer to visualize clearly.*/
+
+div.container {
+  height: 730px;
+  width: 720px;
+}
+
+table.t1 {
+  float: left;
+  height: 720px;
+  width: 100px;
+}
+
+table.t2 {
+  padding: 0 10px 0 10px;
+  background-color: #e5dede;
+  float: left;
+  height: 720px;
+  width: 620px;
+}
+
+tr {
+  height: auto;
+  /*outline: thin solid;*/
+}
+
+td {
+  text-align: right;
+  vertical-align: top;
+  font-family: Calibri;
+  font-size: 14px;
+  font-weight: 600;
+  /*border:solid black;*/
+}
+
+span.left {
+  position: absolute;
+  top: -5px;
+  right: 0;
+}
+
+span.right {
+ color:darkgray;
+}
+
+div.event {
+  height: 100%;
+  text-align: left;
+  border-left: 5px solid #0f8b81;
+  background-color: white;
+  border-radius: 2px;
+}
+
+div.interval {
+  position: relative;
+  height: 100%;
+}
+
+span.end {
+  bottom: -5px;
+  right: 0;
+  position: absolute;
+}
+
+.collpase {
+  visibility: collapse;
+}
+
+span.sample {
+  color: #0f8b81;
+  display: block;
+  margin-left: 2px;
+  padding-top: 2px;
+  font-size: 14px;
+}
+
+span.loc {
+  margin-left: 4px;
+  font-size: 12px;
+  color: darkgray;
+}

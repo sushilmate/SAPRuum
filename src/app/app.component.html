@@ -1,0 +1,46 @@
+<div class="container">
+  <table class="t1">
+    <ng-container *ngFor="let interval of timeIntervals">
+      <tr>
+        <td>
+          <div class="interval">
+            <span class="left"> {{interval.time}} <span class="right">{{interval.zoneOrHalfTime}}</span></span>
+          </div>
+        </td>
+      </tr>
+    </ng-container>
+    <tr>
+      <td>
+        <div class="interval">
+          <span class="right">8.30</span>
+          <span class="end">9.00 PM</span>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <table class="t2">
+    <thead>
+      <tr class="collapse">
+        <!--to adjust atleast 100 events in the calender-->
+        <ng-container *ngFor="let item of [].constructor(100)">
+          <td></td>
+        </ng-container>
+      </tr>
+    </thead>
+    <ng-container *ngFor="let item of events">
+      <tr *ngIf="item.show">
+        <ng-container *ngFor="let spanItem of item.rowSpans">
+          <td [attr.colspan]="item.colSpans" [attr.rowspan]="spanItem">
+            <div class="event">
+              <span class="sample">Sample Item</span>
+              <span class="loc">Sample Location</span>
+            </div>
+          </td>
+        </ng-container>
+      </tr>
+      <tr *ngIf="!item?.show">
+        <!--<td></td>--> <!--empty tr-->
+      </tr>
+    </ng-container>
+  </table>
+</div>
