@@ -37,8 +37,8 @@ export class AppComponent implements OnInit {
       //reset the calender control
       this.events = [];
 
-      // initialize the events
-      for (var i = 0; i < 70; i++) {
+      // initialize the events, as 72 because 12 hours & base 10.
+      for (var i = 0; i < 72; i++) {
         this.events.push(new CalendarEvent(false, [], 100, [], false));
       }
 
