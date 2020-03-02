@@ -26,6 +26,21 @@ export class AppComponent implements OnInit {
     this.layOutDay([{ start: 30, end: 150 }, { start: 540, end: 600 }, { start: 560, end: 620 }, { start: 610, end: 670 }]);
   }
 
+  private initializeIntervals() {
+    this.timeIntervals.push(new Interval("9.00", "AM"), new Interval("", "9.30")
+      , new Interval("10.00", "AM"), new Interval("", "10.30")
+      , new Interval("11.00", "AM"), new Interval("", "11.30")
+      , new Interval("12.00", "PM"), new Interval("", "12.30")
+      , new Interval("1.00", "PM"), new Interval("", "1.30")
+      , new Interval("2.00", "PM"), new Interval("", "2.30")
+      , new Interval("3.00", "PM"), new Interval("", "3.30")
+      , new Interval("4.00", "PM"), new Interval("", "4.30")
+      , new Interval("5.00", "PM"), new Interval("", "5.30")
+      , new Interval("6.00", "PM"), new Interval("", "6.30")
+      , new Interval("7.00", "PM"), new Interval("", "7.30")
+      , new Interval("8.00", "PM"));
+  }
+
   public layOutDay(calederEvent: Event[]) {
     // running in the zone to update view from outside the context or through global event as in from browser.
     this.zone.run(() => {
@@ -98,18 +113,4 @@ export class AppComponent implements OnInit {
     });
   }
 
-  private initializeIntervals() {
-    this.timeIntervals.push(new Interval("9.00", "AM"), new Interval("", "9.30")
-      , new Interval("10.00", "AM"), new Interval("", "10.30")
-      , new Interval("11.00", "AM"), new Interval("", "11.30")
-      , new Interval("12.00", "PM"), new Interval("", "12.30")
-      , new Interval("1.00", "PM"), new Interval("", "1.30")
-      , new Interval("2.00", "PM"), new Interval("", "2.30")
-      , new Interval("3.00", "PM"), new Interval("", "3.30")
-      , new Interval("4.00", "PM"), new Interval("", "4.30")
-      , new Interval("5.00", "PM"), new Interval("", "5.30")
-      , new Interval("6.00", "PM"), new Interval("", "6.30")
-      , new Interval("7.00", "PM"), new Interval("", "7.30")
-      , new Interval("8.00", "PM"));
-  }
 }
