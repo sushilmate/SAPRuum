@@ -1,5 +1,9 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 
+import { Interval } from './shared/interval.model';
+import { CalendarEvent } from './shared/calendar-event.model';
+import { Event } from './shared/event.model';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -9,7 +13,7 @@ export class AppComponent implements OnInit {
 
   public title = 'SAPRuum';
   public timeIntervals: Interval[] = [];
-  public events: CalenderEvent[] = [];
+  public events: CalendarEvent[] = [];
 
   constructor(public zone: NgZone) {
     // global event layoutday can be trigger through website console.
@@ -35,7 +39,7 @@ export class AppComponent implements OnInit {
 
       // initialize the events
       for (var i = 0; i < 70; i++) {
-        this.events.push(new CalenderEvent(false, [], 100, [], false));
+        this.events.push(new CalendarEvent(false, [], 100, [], false));
       }
 
       if (calederEvent == null || !Array.isArray(calederEvent))
@@ -107,21 +111,5 @@ export class AppComponent implements OnInit {
       , new Interval("6.00", "PM"), new Interval("", "6.30")
       , new Interval("7.00", "PM"), new Interval("", "7.30")
       , new Interval("8.00", "PM"));
-  }
-}
-
-export class Interval {
-  constructor(public time: string, public zoneOrHalfTime: string) {
-  }
-}
-
-export class Event {
-  constructor(public start: number, public end: number) {
-  }
-}
-
-export class CalenderEvent {
-  constructor(public show: boolean, public rowSpans: number[], public colSpans: number,
-    public collidedEvents: CalenderEvent[], public visited: boolean) {
   }
 }
