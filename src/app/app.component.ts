@@ -54,7 +54,7 @@ export class AppComponent implements OnInit {
 
       // initialize the events, as 72 because 12 hours & base 10.
       for (var i = 0; i < 72; i++) {
-        this.events.push(new CalendarEvent(false, [], 100, [], false));
+        this.events.push(new CalendarEvent(false, [], 100, [], false, 0));
       }
 
       if (calederEvent == null || !Array.isArray(calederEvent))
@@ -77,12 +77,11 @@ export class AppComponent implements OnInit {
           if (event == calEvent || eventToShow.visited)
             continue;
 
-          if ((event.start <= calEvent.start && event.end >= calEvent.start) ||
-            (event.start <= calEvent.end && event.end >= calEvent.end) ||
-            (event.start >= calEvent.start && event.end <= calEvent.end)) {
+          if (this.isEventsInterSecting(event, calEvent)) {
             if (this.events[calEvent.start / base].visited) {
               // already calculated so dont need to calculate again.
-              colsToDivide -= this.events[calederEvent[i].start / base].colSpans;
+              // and we will choose min space available.
+              colsToDivide = Math.min(colsToDivide, this.events[calederEvent[i].start / base].startColumn);
             }
             else {
               colsToSpan++;// increase the cols to span on calender
@@ -93,17 +92,19 @@ export class AppComponent implements OnInit {
 
         if (!eventToShow.visited) {
           let colSpan = colsToDivide / colsToSpan;
-
           eventToShow.colSpans = colSpan;
           eventToShow.visited = true;
 
+          // we need to track the rendered col position with the event.
+          let eventFirstColPosition = colSpan;
           // only make changes to those not yet visited.
           eventToShow.collidedEvents.filter(x => !x.visited).forEach((event) => {
             event.colSpans = colSpan;
             event.visited = true;
+            event.startColumn = eventFirstColPosition;
+            eventFirstColPosition += colSpan;
           });
         }
-
         // we are not showing the event which are not in scope.
         var sliced = this.events.slice(event.start / base + 1, ((event.end - event.start) / base));
         sliced.forEach((slicedEvent) => {
@@ -113,4 +114,9 @@ export class AppComponent implements OnInit {
     });
   }
 
+  isEventsInterSecting(event: Event, calEvent: Event): boolean {
+    return (event.start <= calEvent.start && event.end >= calEvent.start) ||
+      (event.start <= calEvent.end && event.end >= calEvent.end) ||
+      (event.start >= calEvent.start && event.end <= calEvent.end)
+  }
 }
