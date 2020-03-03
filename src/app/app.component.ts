@@ -52,10 +52,7 @@ export class AppComponent implements OnInit {
       //reset the calender control
       this.events = [];
 
-      // initialize the events, as 72 because 12 hours & base 10.
-      for (var i = 0; i < 72; i++) {
-        this.events.push(new CalendarEvent(false, [], 100, [], false, 0));
-      }
+      this.initializeEvents(base);
 
       if (calederEvent == null || !Array.isArray(calederEvent))
         return;
@@ -63,8 +60,8 @@ export class AppComponent implements OnInit {
       // traversing through every calender event to render on UI.
       calederEvent.forEach((event) => {
 
-        let colsToSpan = 1;
-        let colsToDivide = 100;
+        let interesctEventsCount = 1;
+        let availableCols = 100;
         let eventToShow = this.events[event.start / base];
 
         eventToShow.show = true;
@@ -81,34 +78,42 @@ export class AppComponent implements OnInit {
             if (this.events[calEvent.start / base].visited) {
               // already calculated so dont need to calculate again.
               // and we will choose min space available.
-              colsToDivide = Math.min(colsToDivide, this.events[calederEvent[i].start / base].startColumn);
+              availableCols = Math.min(availableCols, this.events[calederEvent[i].start / base].startColumnPosition);
             }
             else {
-              colsToSpan++;// increase the cols to span on calender
+              interesctEventsCount++;// increase the cols to span on calender
               eventToShow.collidedEvents.push(this.events[calederEvent[i].start / base]);
             }
           }
         }
 
         if (!eventToShow.visited) {
-          let colSpan = colsToDivide / colsToSpan;
-          eventToShow.colSpans = colSpan;
+          let colSpanLength = availableCols / interesctEventsCount;
+
+          eventToShow.colSpans = colSpanLength;
           eventToShow.visited = true;
 
           // we need to track the rendered col position with the event.
-          let eventFirstColPosition = colSpan;
+          let eventFirstColPosition = colSpanLength;
           // only make changes to those not yet visited.
           eventToShow.collidedEvents.filter(x => !x.visited).forEach((event) => {
-            event.colSpans = colSpan;
+            event.colSpans = colSpanLength;
             event.visited = true;
-            event.startColumn = eventFirstColPosition;
-            eventFirstColPosition += colSpan;
+            event.startColumnPosition = eventFirstColPosition;
+            eventFirstColPosition += colSpanLength;
           });
         }
         // we are not showing the event which are not in scope.
         this.removeNonScopedEvents(event, base);
       });
     });
+  }
+  initializeEvents(base: number) {
+    // initialize the events, 12 is 9 AM to 9 PM hours multiply by hours & divide by our base.
+    let numberOfEvents = (12 * 60 / base);
+    for (var i = 0; i < numberOfEvents; i++) {
+      this.events.push(new CalendarEvent(false, [], 100, [], false, 0));
+    }
   }
 
   private isEventsInterSecting(event: Event, calEvent: Event): boolean {
