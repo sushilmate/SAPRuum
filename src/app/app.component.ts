@@ -106,17 +106,21 @@ export class AppComponent implements OnInit {
           });
         }
         // we are not showing the event which are not in scope.
-        var sliced = this.events.slice(event.start / base + 1, ((event.end - event.start) / base));
-        sliced.forEach((slicedEvent) => {
-          slicedEvent.show = null;
-        });
+        this.removeNonScopedEvents(event, base);
       });
     });
   }
 
-  isEventsInterSecting(event: Event, calEvent: Event): boolean {
+  private isEventsInterSecting(event: Event, calEvent: Event): boolean {
     return (event.start <= calEvent.start && event.end >= calEvent.start) ||
       (event.start <= calEvent.end && event.end >= calEvent.end) ||
       (event.start >= calEvent.start && event.end <= calEvent.end)
+  }
+
+  private removeNonScopedEvents(event: Event, base: number) {
+    var sliced = this.events.slice(event.start / base + 1, ((event.end - event.start) / base));
+    sliced.forEach((slicedEvent) => {
+      slicedEvent.show = null;
+    });
   }
 }
