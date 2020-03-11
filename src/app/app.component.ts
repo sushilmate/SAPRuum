@@ -23,12 +23,11 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.initializeIntervals();
     // default events on calender as per spec.
-    //this.layOutDay([{ start: 30, end: 150 }, { start: 540, end: 600 }, { start: 560, end: 620 }, { start: 610, end: 670 }]);
+    this.layOutDay([{ start: 30, end: 150 }, { start: 540, end: 600 }, { start: 560, end: 620 }, { start: 610, end: 670 }]);
     //this.layOutDay([{ start: 50, end: 170 }, { start: 200, end: 350 }, { start: 250, end: 450 }, { start: 280, end: 370 }, { start: 380, end: 570 }, { start: 460, end: 570 }]);
     //this.layOutDay([{ start: 100, end: 300 }, { start: 150, end: 400 }, { start: 200, end: 600 }, { start: 310, end: 800 }]);
-    //this.layOutDay([{ start: 30, end: 150 }, { start: 540, end: 600 }, { start: 560, end: 620 }, { start: 610, end: 670 }]);
     //this.layOutDay([{ start: 30, end: 150 }, { start: 30, end: 150 }]);
-    this.layOutDay([{ start: 30, end: 150 }, { start: 30, end: 150 }, { start: 30, end: 150 }]);
+    //this.layOutDay([{ start: 30, end: 150 }, { start: 30, end: 150 }, { start: 30, end: 150 }]);
     //this.layOutDay([{ start: 30, end: 150 }, { start: 30, end: 150 }, { start: 30, end: 150 }, { start: 30, end: 150 }]);
     //this.layOutDay([{ start: 30, end: 150 }, { start: 60, end: 150 }]);
     //this.layOutDay([{ start: 30, end: 150 }, { start: 180, end: 260 }]);
@@ -36,11 +35,15 @@ export class AppComponent implements OnInit {
     //this.layOutDay([{ start: 30, end: 150 }, { start: 60, end: 180 }, { start: 90, end: 250 }]);
     //this.layOutDay([{ start: 30, end: 150 }, { start: 60, end: 180 }, { start: 70, end: 120 }, { start: 90, end: 250 }]);
     //this.layOutDay([{ start: 30, end: 150 }, { start: 60, end: 180 }, { start: 90, end: 250 }, { start: 200, end: 300 }, { start: 220, end: 330 }]);
-
     //this.layOutDay([{ start: 10, end: 150 }, { start: 240, end: 600 }, { start: 360, end: 620 }, { start: 610, end: 670 }]);
     //this.layOutDay([{ start: 100, end: 200 }, { start: 120, end: 300 }, { start: 180, end: 500 }, { start: 220, end: 400 }, { start: 230, end: 400 }, { start: 310, end: 470 }]);
     //this.layOutDay([{ start: 100, end: 200 }, { start: 120, end: 300 }, { start: 130, end: 180 }, { start: 220, end: 400 }, { start: 230, end: 400 }, { start: 310, end: 470 }]);
     //this.layOutDay([{ start: 100, end: 200 }, { start: 120, end: 300 }, { start: 130, end: 180 }, { start: 220, end: 400 }, { start: 230, end: 400 }, { start: 310, end: 470 }, { start: 330, end: 470 }]);
+    //this.layOutDay([{ start: 100, end: 400 }, { start: 110, end: 400 }, { start: 150, end: 200 }, { start: 250, end: 400 }]);
+    //this.layOutDay([{ start: 100, end: 400 }, { start: 110, end: 190 }, { start: 120, end: 400 }, { start: 250, end: 400 }]);
+    //this.layOutDay([{ start: 100, end: 400 }, { start: 110, end: 150 }, { start: 120, end: 150 }, { start: 130, end: 150 }, { start: 200, end: 400 }]);
+    //this.layOutDay([{ start: 100, end: 400 }, { start: 110, end: 150 }, { start: 120, end: 150 }, { start: 130, end: 150 }, { start: 160, end: 250 }, { start: 170, end: 250 }, { start: 260, end: 400 }]);
+    //this.layOutDay([{ start: 100, end: 500 }, { start: 110, end: 150 }, { start: 120, end: 250 }, { start: 150, end: 390 }]);
   }
 
   private initializeIntervals() {
@@ -78,6 +81,8 @@ export class AppComponent implements OnInit {
       calenderEvent.forEach((currentEvent) => {
 
         let eventToShow = this.events[currentEvent.start / base];
+        eventToShow.start = currentEvent.start;
+        eventToShow.end = currentEvent.end;
         eventToShow.show = true;
         eventToShow.rowSpans.push((currentEvent.end - currentEvent.start) / base);
 
@@ -92,8 +97,7 @@ export class AppComponent implements OnInit {
 
           if (this.isEventsInterSecting(currentEvent, calEvent)) {
             let interSectEvent = this.events[calEvent.start / base];
-            if (!eventToShow.intersectEvents.includes(interSectEvent))
-              eventToShow.intersectEvents.push(interSectEvent);
+            eventToShow.intersectEvents.push(interSectEvent);
           }
         }
       });
@@ -178,6 +182,7 @@ export class AppComponent implements OnInit {
           startPos = sortedEventsByStartColIndex[i].startColIndex + sortedEventsByStartColIndex[i].colSpans;
           continue;
         }
+
         availableCols.push(new ColumnDetails(startPos, (sortedEventsByStartColIndex[i].startColIndex - startPos)));
         startPos = sortedEventsByStartColIndex[i].startColIndex + sortedEventsByStartColIndex[i].colSpans;
       }
@@ -209,25 +214,30 @@ export class AppComponent implements OnInit {
     // initialize the events, 12 is 9 AM to 9 PM hours multiply by hours & divide by our base.
     let numberOfEvents = (12 * 60 / base);
     for (var i = 0; i < numberOfEvents; i++) {
-      this.events.push(new CalendarEvent(false, [], 100, false, 0, []));
+      this.events.push(new CalendarEvent(false, 0, 0, [], 100, false, 0, []));
     }
   }
 
   private isEventsInterSecting(event: Event, calEvent: Event): boolean {
     return (event.start <= calEvent.start && event.end >= calEvent.start) ||
-      (event.start <= calEvent.end && event.end >= calEvent.end) ||
+      (event.start < calEvent.end && event.end >= calEvent.end) ||
       (event.start >= calEvent.start && event.end <= calEvent.end)
   }
 
-  private removeNonScopedEvents(event: Event, base: number): void {
-    var sliced = this.events.slice(event.start / base + 1, ((event.end - event.start) / base));
-    sliced.forEach((slicedEvent) => {
-      slicedEvent.show = null;
-    });
-  }
-
   private applySameColSpanToEveryIntersectEvents(currentEventOnCalender: CalendarEvent): void {
-    let colSpanSize = (100 / (currentEventOnCalender.intersectEvents.length + 1));
+
+    let eventsToShareSpaceWithMainEvent: CalendarEvent[] = [];
+
+    for (var i = 0; i < currentEventOnCalender.intersectEvents.length; i++) {
+      if (currentEventOnCalender.intersectEvents.some(x => x.end <= currentEventOnCalender.intersectEvents[i].start)) {
+        continue;
+      }
+      else {
+        eventsToShareSpaceWithMainEvent.push(currentEventOnCalender.intersectEvents[i]);
+      }
+    }
+
+    let colSpanSize = (100 / (eventsToShareSpaceWithMainEvent.length + 1));
 
     currentEventOnCalender.colSpans = colSpanSize;
     currentEventOnCalender.visited = true;
@@ -235,12 +245,43 @@ export class AppComponent implements OnInit {
 
     let startColIndexCounter = colSpanSize;
 
-    currentEventOnCalender.intersectEvents.forEach((event) => {
+    // this events are the ones who is directly colliding with main event & has someone below them
+    eventsToShareSpaceWithMainEvent.forEach((event) => {
       event.colSpans = colSpanSize;
       event.startColIndex = startColIndexCounter;
       event.visited = true;
       startColIndexCounter += colSpanSize;
     });
+
+    ////not visited events collided with main event but present to some other events
+
+    //let nonVisitedEvents = currentEventOnCalender.intersectEvents.filter(x => !x.visited);
+
+    //startColIndexCounter = colSpanSize;
+
+    //for (var j = 0; j < nonVisitedEvents.length; j++) {
+
+    //  if (nonVisitedEvents[j].visited)
+    //    continue;
+
+    //  alert(nonVisitedEvents[j].intersectEvents.length);
+
+    //  let spaceToDivide = (100 - colSpanSize) / nonVisitedEvents[j].intersectEvents.length;
+
+    //  nonVisitedEvents[j].colSpans = spaceToDivide;
+    //  nonVisitedEvents[j].visited = true;
+    //  nonVisitedEvents[j].startColIndex = colSpanSize;
+
+    //  let startColIndexCounter = colSpanSize + spaceToDivide;
+
+    //  // this events are the ones who is directly colliding with main event & has someone below them
+    //  nonVisitedEvents[j].intersectEvents.filter(x => !x.visited).forEach((event) => {
+    //    event.colSpans = spaceToDivide;
+    //    event.startColIndex = startColIndexCounter;
+    //    event.visited = true;
+    //    startColIndexCounter += spaceToDivide;
+    //  });
+    //}
   }
 }
 
