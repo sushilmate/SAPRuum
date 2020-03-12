@@ -24,7 +24,7 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.initializeIntervals();
     // default events on calender as per spec.
-    //this.layOutDay([{ start: 30, end: 150 }, { start: 540, end: 600 }, { start: 560, end: 620 }, { start: 610, end: 670 }]);
+    this.layOutDay([{ start: 30, end: 150 }, { start: 540, end: 600 }, { start: 560, end: 620 }, { start: 610, end: 670 }]);
     //this.layOutDay([{ start: 50, end: 170 }, { start: 200, end: 350 }, { start: 250, end: 450 }, { start: 280, end: 370 }, { start: 380, end: 570 }, { start: 460, end: 570 }]);
     //this.layOutDay([{ start: 100, end: 300 }, { start: 150, end: 400 }, { start: 200, end: 600 }, { start: 310, end: 800 }]);
     //this.layOutDay([{ start: 30, end: 150 }, { start: 60, end: 150 }]);
@@ -36,13 +36,14 @@ export class AppComponent implements OnInit {
     //this.layOutDay([{ start: 10, end: 150 }, { start: 240, end: 600 }, { start: 360, end: 620 }, { start: 610, end: 670 }]);
     //this.layOutDay([{ start: 100, end: 200 }, { start: 120, end: 300 }, { start: 180, end: 500 }, { start: 220, end: 400 }, { start: 230, end: 400 }, { start: 310, end: 470 }]);
     //this.layOutDay([{ start: 100, end: 200 }, { start: 120, end: 300 }, { start: 130, end: 180 }, { start: 220, end: 400 }, { start: 230, end: 400 }, { start: 310, end: 470 }]);
-    this.layOutDay([{ start: 100, end: 200 }, { start: 120, end: 300 }, { start: 130, end: 180 }, { start: 220, end: 400 }, { start: 230, end: 400 }, { start: 310, end: 470 }, { start: 330, end: 470 }]);
+    //this.layOutDay([{ start: 100, end: 200 }, { start: 120, end: 300 }, { start: 130, end: 180 }, { start: 220, end: 400 }, { start: 230, end: 400 }, { start: 310, end: 470 }, { start: 330, end: 470 }]);
     //this.layOutDay([{ start: 100, end: 400 }, { start: 110, end: 400 }, { start: 150, end: 200 }, { start: 250, end: 400 }]);
     //this.layOutDay([{ start: 100, end: 400 }, { start: 110, end: 190 }, { start: 120, end: 400 }, { start: 250, end: 400 }]);
     //this.layOutDay([{ start: 100, end: 400 }, { start: 110, end: 150 }, { start: 120, end: 150 }, { start: 130, end: 150 }, { start: 200, end: 400 }]);
     //this.layOutDay([{ start: 100, end: 400 }, { start: 110, end: 150 }, { start: 120, end: 150 }, { start: 130, end: 150 }, { start: 160, end: 250 }, { start: 170, end: 250 }, { start: 260, end: 400 }]);
     //this.layOutDay([{ start: 100, end: 500 }, { start: 110, end: 150 }, { start: 120, end: 250 }, { start: 150, end: 390 }]);
     //this.layOutDay([{ start: 100, end: 500 }, { start: 110, end: 150 }, { start: 120, end: 400 }, { start: 150, end: 200 }, { start: 130, end: 500 }, { start: 410, end: 500 }]);
+    //this.layOutDay([{ start: 100, end: 200 }, { start: 110, end: 210 }, { start: 150, end: 190 }, { start: 200, end: 300 }, { start: 220, end: 320 }, { start: 310, end: 360 }, { start: 320, end: 400 }, { start: 330, end: 550 }, { start: 370, end: 550 }, { start: 410, end: 550 }]);
   }
 
   private initializeIntervals() {
@@ -68,7 +69,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  public layOutDay(calenderEvents: Event[]) {
+  public layOutDay(inputEvents: Event[]) {
     // running in the zone to update view from outside the context or through global event as in from browser.
     this.zone.run(() => {
 
@@ -81,11 +82,11 @@ export class AppComponent implements OnInit {
 
       this.initializeEvents(base);
 
-      if (calenderEvents == null || !Array.isArray(calenderEvents))
+      if (inputEvents == null || !Array.isArray(inputEvents))
         return;
 
       // traversing through every calender event to render on UI.
-      calenderEvents.forEach((currentEvent) => {
+      inputEvents.forEach((currentEvent) => {
 
         let eventToShow = this.events[currentEvent.start / base];
         eventToShow.start = currentEvent.start;
@@ -93,9 +94,9 @@ export class AppComponent implements OnInit {
         eventToShow.show = true;
         eventToShow.rowSpans.push((currentEvent.end - currentEvent.start) / base);
 
-        for (var i = 0; i < calenderEvents.length; i++) {
+        for (var i = 0; i < inputEvents.length; i++) {
 
-          let calEvent = calenderEvents[i];
+          let calEvent = inputEvents[i];
 
           // same event.
           if (currentEvent == calEvent) {
@@ -110,9 +111,9 @@ export class AppComponent implements OnInit {
       });
 
       // Calcuate the colspan for event event.
-      for (var i = 0; i < calenderEvents.length; i++) {
+      for (var i = 0; i < inputEvents.length; i++) {
 
-        let currentEventOnCalendar = this.events[calenderEvents[i].start / base];
+        let currentEventOnCalendar = this.events[inputEvents[i].start / base];
 
         if (currentEventOnCalendar.visited || currentEventOnCalendar.intersectEvents.length == 0)
           continue;
