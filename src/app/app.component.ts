@@ -24,28 +24,25 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.initializeIntervals();
     // default events on calender as per spec.
-    this.layOutDay([{ start: 30, end: 150 }, { start: 540, end: 600 }, { start: 560, end: 620 }, { start: 610, end: 670 }]);
+    //this.layOutDay([{ start: 30, end: 150 }, { start: 540, end: 600 }, { start: 560, end: 620 }, { start: 610, end: 670 }]);
     //this.layOutDay([{ start: 50, end: 170 }, { start: 200, end: 350 }, { start: 250, end: 450 }, { start: 280, end: 370 }, { start: 380, end: 570 }, { start: 460, end: 570 }]);
     //this.layOutDay([{ start: 100, end: 300 }, { start: 150, end: 400 }, { start: 200, end: 600 }, { start: 310, end: 800 }]);
-    //this.layOutDay([{ start: 30, end: 150 }, { start: 30, end: 150 }]);
-    //this.layOutDay([{ start: 30, end: 150 }, { start: 30, end: 150 }, { start: 30, end: 150 }]);
-    //this.layOutDay([{ start: 30, end: 150 }, { start: 30, end: 150 }, { start: 30, end: 150 }, { start: 30, end: 150 }]);
     //this.layOutDay([{ start: 30, end: 150 }, { start: 60, end: 150 }]);
     //this.layOutDay([{ start: 30, end: 150 }, { start: 180, end: 260 }]);
     //this.layOutDay([{ start: 30, end: 150 }, { start: 60, end: 100 }]);
-    //this.layOutDay([{ start: 30, end: 150 }, { start: 60, end: 180 }, { start: 90, end: 250 }]);
+    //this.layOutDay([{ start: 30, end: 150 }, { start: 60, end: 180 }, { start: 90, end: 250 }, { start: 100, end: 400 }, { start: 110, end: 500 }, { start: 120, end: 500 }]);
     //this.layOutDay([{ start: 30, end: 150 }, { start: 60, end: 180 }, { start: 70, end: 120 }, { start: 90, end: 250 }]);
     //this.layOutDay([{ start: 30, end: 150 }, { start: 60, end: 180 }, { start: 90, end: 250 }, { start: 200, end: 300 }, { start: 220, end: 330 }]);
     //this.layOutDay([{ start: 10, end: 150 }, { start: 240, end: 600 }, { start: 360, end: 620 }, { start: 610, end: 670 }]);
     //this.layOutDay([{ start: 100, end: 200 }, { start: 120, end: 300 }, { start: 180, end: 500 }, { start: 220, end: 400 }, { start: 230, end: 400 }, { start: 310, end: 470 }]);
     //this.layOutDay([{ start: 100, end: 200 }, { start: 120, end: 300 }, { start: 130, end: 180 }, { start: 220, end: 400 }, { start: 230, end: 400 }, { start: 310, end: 470 }]);
-    //this.layOutDay([{ start: 100, end: 200 }, { start: 120, end: 300 }, { start: 130, end: 180 }, { start: 220, end: 400 }, { start: 230, end: 400 }, { start: 310, end: 470 }, { start: 330, end: 470 }]);
+    this.layOutDay([{ start: 100, end: 200 }, { start: 120, end: 300 }, { start: 130, end: 180 }, { start: 220, end: 400 }, { start: 230, end: 400 }, { start: 310, end: 470 }, { start: 330, end: 470 }]);
     //this.layOutDay([{ start: 100, end: 400 }, { start: 110, end: 400 }, { start: 150, end: 200 }, { start: 250, end: 400 }]);
     //this.layOutDay([{ start: 100, end: 400 }, { start: 110, end: 190 }, { start: 120, end: 400 }, { start: 250, end: 400 }]);
     //this.layOutDay([{ start: 100, end: 400 }, { start: 110, end: 150 }, { start: 120, end: 150 }, { start: 130, end: 150 }, { start: 200, end: 400 }]);
     //this.layOutDay([{ start: 100, end: 400 }, { start: 110, end: 150 }, { start: 120, end: 150 }, { start: 130, end: 150 }, { start: 160, end: 250 }, { start: 170, end: 250 }, { start: 260, end: 400 }]);
     //this.layOutDay([{ start: 100, end: 500 }, { start: 110, end: 150 }, { start: 120, end: 250 }, { start: 150, end: 390 }]);
-    this.layOutDay([{ start: 100, end: 500 }, { start: 110, end: 150 }, { start: 120, end: 400 }, { start: 150, end: 200 }, { start: 130, end: 500 }, { start: 410, end: 500 }]);
+    //this.layOutDay([{ start: 100, end: 500 }, { start: 110, end: 150 }, { start: 120, end: 400 }, { start: 150, end: 200 }, { start: 130, end: 500 }, { start: 410, end: 500 }]);
   }
 
   private initializeIntervals() {
@@ -168,7 +165,7 @@ export class AppComponent implements OnInit {
       colsToDivide = 1;
     }
 
-    let maxColSpan = vacantPositions[0].availableCol / colsToDivide;
+    let maxColSpan = Math.ceil(vacantPositions[0].availableCol / colsToDivide);
 
     currentEventOnCalendar.colSpans = maxColSpan;
     currentEventOnCalendar.startColIndex = vacantPositions[0].startColIndex;
@@ -241,7 +238,7 @@ export class AppComponent implements OnInit {
       }
     }
 
-    let colSpanSize = (100 / (eventsToShareSpaceWithMainEvent.length + 1));
+    let colSpanSize = Math.ceil((100 / (eventsToShareSpaceWithMainEvent.length + 1)));
 
     currentEventOnCalendar.colSpans = colSpanSize;
     currentEventOnCalendar.visited = true;
