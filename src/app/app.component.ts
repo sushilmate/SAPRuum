@@ -3,6 +3,7 @@ import { Component, OnInit, NgZone } from '@angular/core';
 import { Interval } from './shared/interval.model';
 import { CalendarEvent } from './shared/calendar-event.model';
 import { Event } from './shared/event.model';
+import { ColumnDetails } from './shared/column-details.model';
 
 @Component({
   selector: 'app-root',
@@ -44,6 +45,7 @@ export class AppComponent implements OnInit {
     //this.layOutDay([{ start: 100, end: 400 }, { start: 110, end: 150 }, { start: 120, end: 150 }, { start: 130, end: 150 }, { start: 200, end: 400 }]);
     //this.layOutDay([{ start: 100, end: 400 }, { start: 110, end: 150 }, { start: 120, end: 150 }, { start: 130, end: 150 }, { start: 160, end: 250 }, { start: 170, end: 250 }, { start: 260, end: 400 }]);
     //this.layOutDay([{ start: 100, end: 500 }, { start: 110, end: 150 }, { start: 120, end: 250 }, { start: 150, end: 390 }]);
+    this.layOutDay([{ start: 100, end: 500 }, { start: 110, end: 150 }, { start: 120, end: 400 }, { start: 150, end: 200 }, { start: 130, end: 500 }, { start: 410, end: 500 }]);
   }
 
   private initializeIntervals() {
@@ -61,7 +63,15 @@ export class AppComponent implements OnInit {
       , new Interval("8.00", "PM"));
   }
 
-  public layOutDay(calenderEvent: Event[]) {
+  private initializeEvents(base: number): void {
+    // initialize the events, 12 is 9 AM to 9 PM hours multiply by hours & divide by our base.
+    let numberOfEvents = (12 * 60 / base);
+    for (var i = 0; i < numberOfEvents; i++) {
+      this.events.push(new CalendarEvent(false, 0, 0, [], 100, false, 0, []));
+    }
+  }
+
+  public layOutDay(calenderEvents: Event[]) {
     // running in the zone to update view from outside the context or through global event as in from browser.
     this.zone.run(() => {
 
@@ -74,11 +84,11 @@ export class AppComponent implements OnInit {
 
       this.initializeEvents(base);
 
-      if (calenderEvent == null || !Array.isArray(calenderEvent))
+      if (calenderEvents == null || !Array.isArray(calenderEvents))
         return;
 
       // traversing through every calender event to render on UI.
-      calenderEvent.forEach((currentEvent) => {
+      calenderEvents.forEach((currentEvent) => {
 
         let eventToShow = this.events[currentEvent.start / base];
         eventToShow.start = currentEvent.start;
@@ -86,9 +96,9 @@ export class AppComponent implements OnInit {
         eventToShow.show = true;
         eventToShow.rowSpans.push((currentEvent.end - currentEvent.start) / base);
 
-        for (var i = 0; i < calenderEvent.length; i++) {
+        for (var i = 0; i < calenderEvents.length; i++) {
 
-          let calEvent = calenderEvent[i];
+          let calEvent = calenderEvents[i];
 
           // same event.
           if (currentEvent == calEvent) {
@@ -103,41 +113,49 @@ export class AppComponent implements OnInit {
       });
 
       // Calcuate the colspan for event event.
-      for (var i = 0; i < calenderEvent.length; i++) {
+      for (var i = 0; i < calenderEvents.length; i++) {
 
-        let currentEventOnCalender = this.events[calenderEvent[i].start / base];
+        let currentEventOnCalendar = this.events[calenderEvents[i].start / base];
 
-        if (currentEventOnCalender.visited || currentEventOnCalender.intersectEvents.length == 0)
+        if (currentEventOnCalendar.visited || currentEventOnCalendar.intersectEvents.length == 0)
           continue;
 
-        if (currentEventOnCalender.intersectEvents.every(x => !x.visited)) {
+        // logic is divided into two parts, first part is when we get starting main event in the calendar
+        if (currentEventOnCalendar.intersectEvents.every(x => !x.visited)) {
           // fresh lot found
-          this.applySameColSpanToEveryIntersectEvents(currentEventOnCalender);
+          this.applySameColSpanToEveryIntersectEvents(currentEventOnCalendar);
         }
         else {
-          this.calculateAndApplyColSpan(currentEventOnCalender);
+          // second part the subsequent events they might collide with above events.
+          this.calculateAndApplyColSpan(currentEventOnCalendar);
         }
       }
     });
   }
 
-  private calculateAndApplyColSpan(currentEventOnCalender: CalendarEvent): void {
+  private isEventsInterSecting(event: Event, calEvent: Event): boolean {
+    return (event.start <= calEvent.start && event.end >= calEvent.start) ||
+      (event.start < calEvent.end && event.end >= calEvent.end) ||
+      (event.start >= calEvent.start && event.end <= calEvent.end)
+  }
 
-    let visitedIntersectEvents = currentEventOnCalender.intersectEvents.filter(x => x.visited);
+  private calculateAndApplyColSpan(currentEventOnCalendar: CalendarEvent): void {
 
-    let newintersectEvents = currentEventOnCalender.intersectEvents.filter(x => !x.visited);
+    let visitedIntersectEvents = currentEventOnCalendar.intersectEvents.filter(x => x.visited);
+
+    let newIntersectEvents = currentEventOnCalendar.intersectEvents.filter(x => !x.visited);
 
     let colsToDivide = 1;
 
-    let vacentPositions = this.calculateAvailableCols(visitedIntersectEvents);
+    let vacantPositions = this.calculateAvailableCols(visitedIntersectEvents);
 
-    for (var i = 0; i < newintersectEvents.length; i++) {
+    for (var i = 0; i < newIntersectEvents.length; i++) {
 
       let foundVacentPosition = false;
 
       for (var j = 0; j < visitedIntersectEvents.length; j++) {
 
-        if (!newintersectEvents[i].intersectEvents.includes(visitedIntersectEvents[j])) {
+        if (!newIntersectEvents[i].intersectEvents.includes(visitedIntersectEvents[j])) {
           foundVacentPosition = true;
           break;
         }
@@ -146,16 +164,15 @@ export class AppComponent implements OnInit {
         colsToDivide++;
     }
     // new intersect event with current event thats why + 1
-    if (vacentPositions.length >= (newintersectEvents.length + 1)) {
+    if (vacantPositions.length >= (newIntersectEvents.length + 1)) {
       colsToDivide = 1;
     }
 
-    let maxColSpan = vacentPositions[0].availableCol / colsToDivide;
+    let maxColSpan = vacantPositions[0].availableCol / colsToDivide;
 
-    currentEventOnCalender.colSpans = maxColSpan;
-    currentEventOnCalender.startColIndex = vacentPositions[0].startColIndex;
-    currentEventOnCalender.visited = true;
-    //alert(maxColSpan + " " + vacentPositions[0].startColIndex);
+    currentEventOnCalendar.colSpans = maxColSpan;
+    currentEventOnCalendar.startColIndex = vacantPositions[0].startColIndex;
+    currentEventOnCalendar.visited = true;
   }
 
   private calculateAvailableCols(intersectedEvents: CalendarEvent[]): ColumnDetails[] {
@@ -173,18 +190,16 @@ export class AppComponent implements OnInit {
 
       let startPos = sortedEventsByStartColIndex[0].colSpans;
 
-      for (var i = 0; i < sortedEventsByStartColIndex.length; i++) {
+      for (var i = 1; i < sortedEventsByStartColIndex.length; i++) {
+        let currentSortedEvent = sortedEventsByStartColIndex[i];
 
-        if (sortedEventsByStartColIndex[i].startColIndex == 0)
-          continue;
-
-        if (sortedEventsByStartColIndex[i].startColIndex <= startPos) {
-          startPos = sortedEventsByStartColIndex[i].startColIndex + sortedEventsByStartColIndex[i].colSpans;
+        if (currentSortedEvent.startColIndex <= startPos) {
+          startPos = currentSortedEvent.startColIndex + currentSortedEvent.colSpans;
           continue;
         }
 
-        availableCols.push(new ColumnDetails(startPos, (sortedEventsByStartColIndex[i].startColIndex - startPos)));
-        startPos = sortedEventsByStartColIndex[i].startColIndex + sortedEventsByStartColIndex[i].colSpans;
+        availableCols.push(new ColumnDetails(startPos, (currentSortedEvent.startColIndex - startPos)));
+        startPos = currentSortedEvent.startColIndex + currentSortedEvent.colSpans;
       }
 
       // check if we reached end or not, there might some space available if events occured in between
@@ -198,9 +213,10 @@ export class AppComponent implements OnInit {
       let end = intersectedEvents[0].startColIndex + intersectedEvents[0].colSpans;
 
       for (var i = 1; i < intersectedEvents.length; i++) {
+        let currentEvent = intersectedEvents[i];
 
-        availableCols.push(new ColumnDetails(end, intersectedEvents[i].startColIndex - end));
-        end = intersectedEvents[i].startColIndex + intersectedEvents[i].colSpans;
+        availableCols.push(new ColumnDetails(end, currentEvent.startColIndex - end));
+        end = currentEvent.startColIndex + currentEvent.colSpans;
       }
       // check if we reached end or not, there might some space available if events occured in between
       if (end < 99) {
@@ -210,38 +226,26 @@ export class AppComponent implements OnInit {
     return availableCols;
   }
 
-  private initializeEvents(base: number): void {
-    // initialize the events, 12 is 9 AM to 9 PM hours multiply by hours & divide by our base.
-    let numberOfEvents = (12 * 60 / base);
-    for (var i = 0; i < numberOfEvents; i++) {
-      this.events.push(new CalendarEvent(false, 0, 0, [], 100, false, 0, []));
-    }
-  }
-
-  private isEventsInterSecting(event: Event, calEvent: Event): boolean {
-    return (event.start <= calEvent.start && event.end >= calEvent.start) ||
-      (event.start < calEvent.end && event.end >= calEvent.end) ||
-      (event.start >= calEvent.start && event.end <= calEvent.end)
-  }
-
-  private applySameColSpanToEveryIntersectEvents(currentEventOnCalender: CalendarEvent): void {
+  private applySameColSpanToEveryIntersectEvents(currentEventOnCalendar: CalendarEvent): void {
 
     let eventsToShareSpaceWithMainEvent: CalendarEvent[] = [];
 
-    for (var i = 0; i < currentEventOnCalender.intersectEvents.length; i++) {
-      if (currentEventOnCalender.intersectEvents.some(x => x.end <= currentEventOnCalender.intersectEvents[i].start)) {
+    // this is find if some events comes after any other events which collides with main event.
+    // we dont have calculate space for them as they might fit below 
+    for (var i = 0; i < currentEventOnCalendar.intersectEvents.length; i++) {
+      if (currentEventOnCalendar.intersectEvents.some(x => x.end <= currentEventOnCalendar.intersectEvents[i].start)) {
         continue;
       }
       else {
-        eventsToShareSpaceWithMainEvent.push(currentEventOnCalender.intersectEvents[i]);
+        eventsToShareSpaceWithMainEvent.push(currentEventOnCalendar.intersectEvents[i]);
       }
     }
 
     let colSpanSize = (100 / (eventsToShareSpaceWithMainEvent.length + 1));
 
-    currentEventOnCalender.colSpans = colSpanSize;
-    currentEventOnCalender.visited = true;
-    currentEventOnCalender.startColIndex = 0;
+    currentEventOnCalendar.colSpans = colSpanSize;
+    currentEventOnCalendar.visited = true;
+    currentEventOnCalendar.startColIndex = 0;
 
     let startColIndexCounter = colSpanSize;
 
@@ -252,41 +256,5 @@ export class AppComponent implements OnInit {
       event.visited = true;
       startColIndexCounter += colSpanSize;
     });
-
-    ////not visited events collided with main event but present to some other events
-
-    //let nonVisitedEvents = currentEventOnCalender.intersectEvents.filter(x => !x.visited);
-
-    //startColIndexCounter = colSpanSize;
-
-    //for (var j = 0; j < nonVisitedEvents.length; j++) {
-
-    //  if (nonVisitedEvents[j].visited)
-    //    continue;
-
-    //  alert(nonVisitedEvents[j].intersectEvents.length);
-
-    //  let spaceToDivide = (100 - colSpanSize) / nonVisitedEvents[j].intersectEvents.length;
-
-    //  nonVisitedEvents[j].colSpans = spaceToDivide;
-    //  nonVisitedEvents[j].visited = true;
-    //  nonVisitedEvents[j].startColIndex = colSpanSize;
-
-    //  let startColIndexCounter = colSpanSize + spaceToDivide;
-
-    //  // this events are the ones who is directly colliding with main event & has someone below them
-    //  nonVisitedEvents[j].intersectEvents.filter(x => !x.visited).forEach((event) => {
-    //    event.colSpans = spaceToDivide;
-    //    event.startColIndex = startColIndexCounter;
-    //    event.visited = true;
-    //    startColIndexCounter += spaceToDivide;
-    //  });
-    //}
-  }
-}
-
-export class ColumnDetails {
-  constructor(public startColIndex: number, public availableCol: number) {
-
   }
 }
